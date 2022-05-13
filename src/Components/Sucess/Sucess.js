@@ -22,7 +22,7 @@ const Sucess = () => {
       </h1>
       <img
         className="text-center  "
-        src="http://gimpchat.com/download/file.php?id=44925&sid=eda88eb4bfca0ff87b5385dce7e9ebb0"
+        src="/Images/on_the_way.gif"
         alt="on the way"
       />
     </div>
