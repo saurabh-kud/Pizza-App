@@ -1,35 +1,21 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../../api/pizza";
-import { CartContext } from "../../CartContext";
+import { add } from "../../Store/CartSlice";
 
 const ProductDetails = () => {
+  const dispach = useDispatch();
   const [product, setProduct] = useState({});
   const [isFetched, setIsFetched] = useState(false);
   const param = useParams();
   const navigate = useNavigate();
 
-  const { cart, setCart } = useContext(CartContext);
   const [isAdding, setIsAdding] = useState(false);
 
   const addToCart = (e) => {
-    e.preventDefault();
-    let _cart = { ...cart };
-    if (!_cart.Items) {
-      _cart.Items = {};
-    }
-    if (_cart.Items[product._id]) {
-      _cart.Items[product._id] += 1;
-    } else {
-      _cart.Items[product._id] = 1;
-    }
-    if (!_cart.totalItems) {
-      _cart.totalItems = 1;
-    } else {
-      _cart.totalItems += 1;
-    }
-    setCart(_cart);
+    dispach(add(product._id));
 
     setIsAdding(true);
     setTimeout(() => {

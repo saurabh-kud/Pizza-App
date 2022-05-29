@@ -1,12 +1,13 @@
 import React, { useContext, useRef, useState } from "react";
 import { FaSearch } from "react-icons/fa";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { CartContext } from "../../CartContext";
 
 const Header = (props) => {
+  const items = useSelector((state) => state.cart);
+
   const [text, setText] = useState("");
   const textEl = useRef();
-  const { cart } = useContext(CartContext);
 
   const handleChange = () => {
     setText(textEl.current.value);
@@ -40,7 +41,7 @@ const Header = (props) => {
         <Link to="/cart">
           <li className="ml-6">
             <div className="flex items-center font-semibold  justify-between bg-yellow-400 hover:bg-yellow-600 px-2 gap-1 py-0.5 rounded-full ">
-              <span>{cart.totalItems ? cart.totalItems : 0}</span>
+              <span>{items.totalItems ? items.totalItems : 0}</span>
               <img src="/Images/cart.png" alt="cart" />
             </div>
           </li>

@@ -1,28 +1,16 @@
-import React, { useContext, useState } from "react";
-import { CartContext } from "../../CartContext";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { add } from "../../Store/CartSlice";
 
 const Product = ({ product }) => {
-  const { cart, setCart } = useContext(CartContext);
   const [isAdding, setIsAdding] = useState(false);
+  const dispach = useDispatch();
 
   const addToCart = (e) => {
     e.preventDefault();
-    let _cart = { ...cart };
-    if (!_cart.Items) {
-      _cart.Items = {};
-    }
-    if (_cart.Items[product._id]) {
-      _cart.Items[product._id] += 1;
-    } else {
-      _cart.Items[product._id] = 1;
-    }
-    if (!_cart.totalItems) {
-      _cart.totalItems = 1;
-    } else {
-      _cart.totalItems += 1;
-    }
-    setCart(_cart);
+
+    dispach(add(product._id));
 
     setIsAdding(true);
     setTimeout(() => {

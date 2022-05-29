@@ -1,50 +1,29 @@
-import axios from "axios";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { CartFetchThunk, deleteList, getCart } from "../../Store/CartFetch";
 
-import { CartContext } from "../../CartContext";
+import { add, remove, decrease, setinitial } from "../../Store/CartSlice";
+
 const Cart = () => {
-  const [cartProducts, setCartProducts] = useState([]);
-  const [priceFetched, setPriceFetched] = useState(false);
   let total = 0;
+  const items = useSelector((state) => state.cart);
+  const dispach = useDispatch();
+
+  const [priceFetched, setPriceFetched] = useState(false);
+
+  let newList = items.Items ? Object.keys(items.Items) : [];
+
   const navigate = useNavigate();
 
-  const { cart, setCart } = useContext(CartContext);
-
-  async function getCartProducts() {
-    try {
-      axios({
-        method: "post",
-        url: "https://ecom-rest-apis.herokuapp.com/api/products/cart-items",
-
-        headers: {
-          "Content-Type": "application/json",
-        },
-
-        data: JSON.stringify({ ids: Object.keys(cart.Items) }),
-      }).then((responce) => {
-        setCartProducts(responce.data);
-
-        setPriceFetched(true);
-      });
-    } catch (error) {}
-  }
-
   useEffect(() => {
-    if (!cart.Items) {
-      setPriceFetched(true);
-      return;
-    }
+    dispach(CartFetchThunk(newList));
+  }, []);
 
-    if (priceFetched) {
-      return;
-    }
-
-    getCartProducts();
-  }, [cart, priceFetched]);
+  const cartProducts = useSelector(getCart);
 
   const getqty = (productId) => {
-    return cart.Items[productId];
+    return items.Items[productId];
   };
 
   const getPrice = (cartProduct) => {
@@ -54,39 +33,29 @@ const Cart = () => {
   };
 
   const increase = (productId) => {
-    const _cart = { ...cart };
-    _cart.Items[productId] += 1;
-    _cart.totalItems += 1;
-    setCart(_cart);
+    dispach(add(productId));
   };
 
-  const decrease = (productId) => {
-    if (cart.Items[productId] === 1) {
-      return;
-    }
-    const _cart = { ...cart };
-    _cart.Items[productId] -= 1;
-    _cart.totalItems -= 1;
-    setCart(_cart);
+  const decreases = (productId) => {
+    dispach(decrease(productId));
   };
 
   const handleDelete = (productId) => {
-    const _cart = { ...cart };
-    const qnt = _cart.Items[productId];
-    delete _cart.Items[productId];
-    _cart.totalItems -= qnt;
-    setCart(_cart);
-    const updatedCartList = cartProducts.filter(
-      (cartProduct) => cartProduct._id !== productId
-    );
-    setCartProducts(updatedCartList);
+    newList = newList.filter((id) => id !== productId);
+    dispach(CartFetchThunk(newList));
+    dispach(remove(productId));
   };
 
   const handleOrder = () => {
-    setCart({});
-    setPriceFetched(true);
+    dispach(setinitial());
+
+    dispach(deleteList());
+
+    // setPriceFetched(true);
     navigate(`/sucess/${new Date().getTime().toString()}`);
   };
+
+  setTimeout(() => setPriceFetched(true), 400);
 
   return !priceFetched ? (
     <div className="container mx-auto  lg:w-1/2 w-full px-1 ">
@@ -144,7 +113,7 @@ const Cart = () => {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => {
-                      decrease(cartProduct._id);
+                      decreases(cartProduct._id);
                     }}
                     className="rounded-full bg-yellow-400 px-4 py-1  hover:bg-yellow-600 text-white font-bold"
                   >

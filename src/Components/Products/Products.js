@@ -15,8 +15,7 @@ const Products = (props) => {
     }
 
     const searchRes = products.filter((product) => {
-      return Object.values(product.name)
-        .join(" ")
+      return product.name
         .toLowerCase()
         .includes(props.searchText.toLowerCase());
     });
